@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+  <head>
+    <title>Redirect Authentication Type Design</title>
+<style>
+BODY
+{
+	font-family: Lucida Sans Unicode, Verdana,	Arial, Helvetica,	Sans-serif;
+	margin-left: 3%;
+	margin-right:	3%;
+}
+
+.code
+{
+    font-family: Courier;
+    background-color: #EEEEDD;
+    white-space: pre;
+    padding: 15px;
+}
+</style>
+    
+  </head>
+  <body>
+    <h2>Redirect Authentication Type Design</h2>
+    by <a href="http://grumet.net/weblog/">Andrew Grumet</a> on 22 September, 2003.
+    <hr />
+
+    <p>
+      This document proposes a design for handling external authentication from a 
+      remote system such as SloanSpace.
+    </p>
+    <h3>The Big Picture</h3>
+    <p>
+      The redirect authentication system is part of our efforts to hook into existing 
+      infrastructure. Chances are good that new adopters already have a sign in 
+      system. We want to take advantage of that when possible. This system proposes a 
+      design for handling the case where central passwords are entereed into a 
+      central web application to which we will redirect the user for login.
+    </p>
+
+    <h3>OpenACS</h3>
+    <p>
+      After signing into OpenACs, users wishing to log in to another site will 
+      either browse to or be redirected to <code>/auth-server/login</code>. This 
+      script will generate and store a random string to be used by the the client 
+      system. It will also generate a nonrepeating integer to combine with the random 
+      string to create a login token. The integer, random string and OpenACS <code>user_id</code>
+      will be stored in the database for later use.
+    </p>
+    <pre><p class="code">create sequence auth_server_token_id_seq start with 1;
+
+create table authentication_server_token (
+    token_id                    integer
+                                constraint auth_srv_token_pk
+                                primary key,
+    user_id                     integer
+                                constraint auth_srv_user_id_nn
+                                not null
+                                constraint auth_srv_user_id_fk
+                                references users,
+    token                       char(40)
+                                constraint auth_srv_token_nn
+                                not null,
+    consumed_on                 date
+);</p></pre>
+
+    <h3>Other System</h3>
+    <p>
+      After database insertion, the user will be redirected to a
+      particular URL on the other site with the unique key added as a
+      URL argument. The client login page will make a request back to
+      SloanSpace, sending the unique key.  Sloanspace will try to
+      match this key against a row in the database having a non-null
+      <code>consumed_on</code> column. If a match is found, OpenACS
+      with return a document with the logged in user's email address
+      and perhaps their first and last names. It will also mark the
+      token as having been consumed.
+    </p>
+  </body>
+
+</html>
