@@ -1,5 +1,7 @@
 ad_library {
     Library routines for authentication server.
+
+    @cvs-id $Id$
 }
 
 namespace eval auth::server {}
