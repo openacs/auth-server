@@ -11,7 +11,7 @@
     <version name="1.0d1" url="http://openacs.org/repository/download/apm/auth-server-1.0d1.apm">
         <owner url="mailto:lars@collaboraid.biz">Lars Pind</owner>
         <owner url="mailto:aegrumet@mit.edu">Andrew Grumet</owner>
-        <summary>Allows OpenACS to act as an authentication server in a single-sign-on environment.</summary>
+        <summary>Allows OpenACS to act as an authentication server for a single-sign-on environment.</summary>
 
         <!-- No dependency information -->
 
